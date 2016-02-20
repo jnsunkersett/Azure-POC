@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+ 
+  
+  
+  <!-- <bean 
+  class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" /> -->
+ 
+ <bean id="multipartResolver"
+	class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+	
+	
+
+ <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+          <property name="location" value="WEB-INF/resources/message.properties"/>
+ </bean>
+ 	<!-- Register the Customer.properties 
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="message" />
+	</bean>-->
+ 
+	<bean id="viewResolver"
+	      class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+          <property name="prefix">
+              <value>/WEB-INF/pages/</value>
+           </property>
+          <property name="suffix">
+             <value>.jsp</value>
+          </property>
+    </bean>
+    <context:component-scan base-package="com.mkyong.common.controller" />
+   
+ 	<bean id="fileUploadDao" class="com.psl.dao.impl.FileUploadDaoImpl"></bean>
+	<bean id="sbQueueDao" class="com.psl.dao.impl.SBQueueDaoImpl"></bean>
+	<bean id="fileUploadService" class="com.psl.service.impl.FileUplaodServiceImpl"/>
+	<bean id="amqpSender" class="com.psl.sender.amqp.AMQPSender"/>
+
+</beans>
