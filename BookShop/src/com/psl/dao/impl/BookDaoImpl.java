@@ -12,9 +12,17 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.microsoft.azure.storage.CloudStorageAccount;
@@ -31,6 +39,7 @@ import com.microsoft.windowsazure.services.servicebus.models.ReceiveMessageOptio
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveMode;
 import com.microsoft.windowsazure.services.servicebus.models.ReceiveQueueMessageResult;
 import com.psl.dao.BookDao;
+import com.psl.hibernate.util.HibernateUtil;
 import com.psl.model.Book;
 
 public class BookDaoImpl implements BookDao {
@@ -40,45 +49,9 @@ public class BookDaoImpl implements BookDao {
 	@Autowired
 	private java.util.Properties properties;
 	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost/BookShop";
 	// Define the connection-string with your values
 	final String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=wmigrationstorage;AccountKey=BSVnexsngHJWuI8/2FMIM9JUldADwBUgBuFDjNZaocFsMTKYAy+OOWQX7yyDBvFeWDaMtBgOtGRAPHgUgQM3VQ==";
 
-	// Database credentials
-	static final String USER = "root";
-	static final String PASS = "password";
-
-	private Connection getJDBCConnection() {
-		Connection conn = null;
-		// Register JDBC driver
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			// Open a connection
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return conn;
-
-	}
-
-	private List<Book> getAvailableBooks(){
-		List<Book> bookList = new ArrayList<>();
-		Book book1 = new Book("Revolution 2020", "Chetan Bhagat", 200);
-		Book book2 = new Book("Old Man and the Sea", "Ernest Hemmingway", 400);
-		Book book3 = new Book("The Giver", "Lois Lowry", 300);
-		Book book4 = new Book("Agnipankh", "Dr.APJ Abdul Kalam", 700);
-		Book book5 = new Book("Musafir", "Achyut Godbole", 600);
-		bookList.add(book1);
-		bookList.add(book2);
-		bookList.add(book3);
-		bookList.add(book4);
-		bookList.add(book5);
-		return bookList;
-	}
 	private List<Book> getBooksFromSBQueue(){
 		
 		logger.info("In getBooksFromSBQueue() of BookDaoImpl");
@@ -144,32 +117,27 @@ public class BookDaoImpl implements BookDao {
 	
 }
 	
+	public void deleteAllBooks() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		String stringQuery = "DELETE * FROM BOOK";
+		Query query = session.createQuery(stringQuery);
+		query.executeUpdate();
+		session.getTransaction().commit();
+	}
+	
 	@Override
 	public List<Book> listOfAllBooks() {
-		/*Connection connection = getJDBCConnection();
-		 Statement stmt = null;
-		 String sql = null;
-		 List<Book> bookList = new ArrayList<>();
-		//Execute a query
-	      try {
-			stmt = connection.createStatement();
-			sql = "SELECT * FROM Books";
-		    ResultSet rs = stmt.executeQuery(sql);
-		    while(rs.next()){
-		    	String name = rs.getString("name");
-		    	String author = rs.getString("author");
-		    	double price = rs.getDouble("price");
-		    	int id = rs.getInt("id");
-		    	Book book = new Book(name, author, price);
-		    	bookList.add(book);
-		    }
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
-		List<Book> bookList = getBooksFromSBQueue(); 
+		
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		@SuppressWarnings("unchecked")
+		List<Book> bookList = session.createCriteria(Book.class).list();
+		session.close();
 		return bookList;
 	}
 
+/* ---- not required
 	@Override
 	public void downloadImageFromBlobStorage() {
 		try {
@@ -183,6 +151,31 @@ public class BookDaoImpl implements BookDao {
 			logger.error("This is storageException : " + storageException.getStackTrace());
 		}
 		
+	}
+------ */
+	
+	@Override
+	public void save(Book book) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		session.beginTransaction();
+		session.save(book);
+		session.getTransaction().commit();
+		session.close();
+	}
+
+	@Override
+	public void save(String bookAsJSONString) throws ParseException 
+	{
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObject = (JSONObject)(parser.parse(bookAsJSONString));
+
+		Book book = new Book();
+		book.setName((String) jsonObject.get("name"));
+		book.setAuthor((String) jsonObject.get("author"));
+		book.setPrice((double) jsonObject.get("price"));
+		book.setBlobPictureUrl((String) jsonObject.get("blobPictureUrl"));
+		
+		save(book);
 	}
 
 }

@@ -18,9 +18,28 @@
 	  	<property name="suffix"><value>.jsp</value></property>
 	</bean>
 	<bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-          <property name="location" value="WEB-INF/resources/message.properties"/>
+          <property name="location" value="WEB-INF/classes/message.properties"/>
     </bean>
 	<bean id="bookDao" class="com.psl.dao.impl.BookDaoImpl"></bean>
 
 	<bean id="bookService" class="com.psl.service.impl.BookServiceImpl"></bean>
+	<bean id="amqpReceiver" class="com.psl.receiver.amqp.AMQPReceiver">
+		<constructor-arg ref="bookService"/>
+	</bean>
+	<!-- 
+	<bean id="jndiLookup" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="cache" value="true" />
+		<property name="lookupOnStartup" value="true" />
+		<property name="proxyInterface" value="your fully qualified look up business interface" />
+		<property name="jndiName" >
+			<value>contextName/ejbName/remote or local </value>  
+		</property>
+		<property name="jndiEnvironment">
+			<props>
+				<prop key="java.naming.factory.initial">org.apache.qpid.amqp_1_0.jms.jndi.PropertiesFileInitialContextFactory</prop>
+			    <prop key="java.naming.provider.url">file://sb.properties</prop>
+			</props>
+		</property>
+	</bean>	
+	 -->
 </beans>

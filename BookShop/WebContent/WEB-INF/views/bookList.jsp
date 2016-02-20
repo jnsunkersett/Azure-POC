@@ -8,7 +8,8 @@
 <title>BookList</title>
 </head>
 <body>
-
+	<h3>Welcome to the Book Shop</h3>
+	<br>
 		<c:choose>
     		<c:when test="${empty bookList}">
         		Sorry!! No book is available as yet... 
@@ -17,30 +18,35 @@
     		<c:otherwise>
        			<table>
 					<tr>
-						<th>Name</th>
-						<th>Author</th>
-						<th>Price</th>
-						<th>Preview URL</th>
+						<th width="100" align="left">Name</th>
+						<th width="100" align="left">Author</th>
+						<th width="100" align="left">Price</th>
+						<th width="200" align="left">Preview URL</th>
 					</tr>
 					<c:forEach items="${bookList}" var="book">
 					<tr> 
-						<td>
+						<td width="100">
 						<c:out value="${book.name}"/>
 						</td>
-						<td>
+						<td width="100">
 						<c:out value="${book.author}"/>
 						</td>
-						<td>
+						<td width="100">
 						<c:out value="${book.price}"/>
 						</td>
-						<td>
+						<td width="200">
 							<a href=
 							<c:out value="${book.blobPictureUrl}"/>>Preview here</a>
 						</td>
 					</tr>
 					</c:forEach>
-		
+					<tr>
+						<td colspan="4">
+							<p>Start with a clean slate. <a href="listAllBooks.htm">Delete All records</a></p>
+						</td>
+					</tr>
 				</table>
+				
     		</c:otherwise>
 		</c:choose>
 		

@@ -2,6 +2,7 @@ package com.psl.model;
 
 public class Book {
 
+	private int bookId;
 	private String name;
 	private String author;
 	private double price;
@@ -16,6 +17,12 @@ public class Book {
 	}
 	public Book() {
 		// TODO Auto-generated constructor stub
+	}
+	public int getBookId() {
+		return bookId;
+	}
+	public void setBookId(int bookId) {
+		this.bookId = bookId;
 	}
 	public String getBlobPictureUrl() {
 		return blobPictureUrl;

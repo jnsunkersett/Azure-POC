@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.psl.model" table="book">
+        <id name="bookId" type="java.lang.Long">
+            <column name="BOOK_ID" precision="5" scale="0" />
+            <generator class="identity" />
+        </id>
+        <property name="name" type="string">
+            <column name="BOOK_NAME" length="20" not-null="true" />
+        </property>
+        <property name="author" type="string">
+            <column name="AUTHOR" length="20" not-null="true" />
+        </property>
+        <property name="price" type="double">
+            <column name="PRICE" length="20" not-null="true" />
+        </property>
+        <property name="blobPictureUrl" type="string">
+            <column name="PREVIEW_URL" length="2000" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
