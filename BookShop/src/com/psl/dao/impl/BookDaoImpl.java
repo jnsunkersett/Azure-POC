@@ -50,7 +50,6 @@ public class BookDaoImpl implements BookDao {
 	private java.util.Properties properties;
 	// JDBC driver name and database URL
 	// Define the connection-string with your values
-	final String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=wmigrationstorage;AccountKey=BSVnexsngHJWuI8/2FMIM9JUldADwBUgBuFDjNZaocFsMTKYAy+OOWQX7yyDBvFeWDaMtBgOtGRAPHgUgQM3VQ==";
 
 	private List<Book> getBooksFromSBQueue(){
 		
